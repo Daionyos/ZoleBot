@@ -3,9 +3,9 @@ from card import Card
 from Player import Player
 
 class Game:
-    def __init__(self, players, skat):
+    def __init__(self, players):
         self.players = players                  # List of Player objects
-        self.skat = skat                        # The 2 cards left after dealing (skat)
+        self.skat = self.deal_cards(self.create_deck(),players)[1]                        # The 2 cards left after dealing (skat)
         self.middle = []                        # Cards played in the current trick
         self.played_cards = []                  # All played cards
 
@@ -67,11 +67,46 @@ class Game:
         return deck
 
     @staticmethod
-    def deal_cards(deck):
+    def deal_cards(deck,players):
         random.shuffle(deck)
-        players = [Player(), Player(), Player()]
         for i in range(8):
             for p in range(3):
                 players[p].hand.append(deck.pop())
         skat = [deck.pop(), deck.pop()]
         return players, skat
+
+    def legal_cards(self,middle,player_hand):
+        if middle[0] is None:# first player
+            for card in player_hand:
+                card.legal = True
+        elif middle[0].suit ==4 or middle[0].value >12:# first player played trump
+            print("first player played trump")
+            if 4 not in [card.suit for card in player_hand] or any(card.value >12 for card in player_hand): #does not have trump in hand
+                    print("does not have trump in hand")
+                    for card in player_hand:
+                        card.legal = True
+                    return
+            else: # has trump in hand 
+                print("has trump in hand")
+                for card in player_hand:
+                    if card.suit ==4 or card.value >12:
+                        card.legal = True
+                    elif card.suit !=4 and card.value <13:
+                        card.legal = False 
+                return        
+        elif middle[0].suit in [card.suit for card in player_hand if card.suit !=4 and card.value <13]: # follow suit
+            print("has required non trump suit")
+            if middle[0].suit in [card.suit for card in player_hand if card.suit !=4 and card.value <13]: # has non trump suit
+                for card in player_hand:
+                    if card.suit == middle[0].suit and card.value <13:
+                        card.legal = True
+                    elif card.suit != middle[0].suit and card.value <13:
+                        card.legal = False
+                return
+            else: #does not have the required non trump suit
+                print("does not have required non trump suit")
+                for card in player_hand:
+                    card.legal = True
+                return
+
+    
