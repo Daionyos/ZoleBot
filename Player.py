@@ -2,6 +2,7 @@ class Player:
     counter = 0 # Static counter to track deal order
     def __init__(self):
         self.game_score = 0
+        self.round_points = 0
         self.hand = []
         self.is_bigGuy = False
         self.id = count(self.__class__.counter,self)

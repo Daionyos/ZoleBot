@@ -1,12 +1,29 @@
-class Card:
-    def __init__(self, points: int, suit: int, value: int):
-        self.points = points    # Points of the card
-        self.suit = suit        # 1=Clubs, 2=Spades, 3=Hearts, 4=Diamonds
-        self.value = value      # 7-14 (Ace=14, King=13, Queen=12, Jack=11)
-        self.legal = True       # Placeholder for legality check
+from SuitEnum import Suit
+from RankEnum import Rank
 
+class Card:
+    def __init__(self,rank:Rank,suit:Suit):
+        self.rank= rank
+        self.suit= suit
+        self.points =self.calc_points()
+        
+    def __eq__(self, value):
+        if not isinstance(value, Card):
+            raise TypeError(f"Comparing Card with another incompatible class {type(value)}")
+        return self.__key() == value.__key()
+    
+    def __key(self):
+        return (self.rank, self.suit)
+    
+    def __hash__(self):
+        return hash(self.__key())
+
+    def calc_points(self):
+        point_map = {Rank.SEVEN:0,Rank.EIGHT:0,Rank.NINE:0,Rank.TEN:10,Rank.JACK:2,Rank.QUEEN:3,Rank.KING:4,Rank.ACE:11 }
+        return point_map[self.rank]
+    
     def __repr__(self):
-        suit_names = {1: "Clubs", 2: "Spades", 3: "Hearts", 4: "Diamonds"}
-        value_names = {13: "Jack", 14: "Queen", 10: "King",11: "Ten", 12: "Ace"}
-        name = value_names.get(self.value, str(self.value))
-        return f"{name} of {suit_names[self.suit]} (Points: {self.points})"
+        return f"{self.rank.name} of {self.suit.name}"
+    
+card1 = Card(Rank.ACE, Suit.CLUBS)
+card2 = Card(Rank.ACE, Suit.CLUBS)
